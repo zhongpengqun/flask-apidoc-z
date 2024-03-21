@@ -29,44 +29,19 @@
                     {% for bp in gen.blueprint_ins %}
                     <li class="list-group-item text-center">{{ bp.name }}</li>
                         {% for f in bp.funcs %}
-                    <li class="list-group-item">[#{{f.uid}}] {{ f.link() | safe }}</li>
+                    <li class="list-group-item">{{ f.link() | safe }}</li>
                         {% endfor %}
                     {% endfor %}
                 </ul>
 
             </div>
             <div class="col-xs-7 col-md-9">
-                <div class="panel panel-default">
-                    <div class="panel-heading">ToolBox:[Base64 和 设置公共认证Header]</div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-xs-4 col-md-4">
-                                <form class="form-inline">
-                                  <div class="form-group">
-                                    <label class="sr-only" for="b64str"></label>
-                                    <input type="text" class="form-control" id="b64str" placeholder="str to urlsafe base64">
-                                  </div>
-                                  <button id="b64a-str" type="button" class="btn btn-default">Base64</button>
-                                </form>
-                            </div>
-                            <div class="col-xs-4 col-md-4">
-                                <form class="form-inline" method="get">
-                                  <div class="form-group">
-                                    <label class="sr-only" for="global-auth-header">Email address</label>
-                                    <input type="text" class="form-control" name="auth" id="global-auth-header" {%if gen.global_auth%}value="{{ gen.global_auth }}"{% else %}placeholder="Auth Header: Basic xxxxx for Example"{%endif%}>
-                                  </div>
-                                  <button type="submit" class="btn btn-default">Setup</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 {% for bp in gen.blueprint_ins %}
                 <div class="well">{{ bp.name }}</div>
                 {% for f in bp.funcs %}
                 {{ f.anchor() | safe }}
                 <div class="panel panel-default">
-                    <div class="panel-heading"> [#{{f.uid}}] {{ f.name }}</div>
+                    <div class="panel-heading">{{ f.name }}</div>
                     <div class="panel-body">
                         {% if f.has_content %}
                         <pre>{{ f.content }}</pre>
@@ -93,7 +68,7 @@
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {% for k, v in f.url_params.iteritems() %}
+                                    {% for k, v in f.url_params.items() %}
                                     <tr>
                                         {% for col in v %}
                                         <td>{{ col }}</td>
@@ -217,7 +192,7 @@
                                    URL Parameters
                                 </div>
                               </div>
-                              {% for k, v in f.url_params.iteritems() %}
+                              {% for k, v in f.url_params.items() %}
                               <div class="form-group">
                                 <label for="u_{{ f.uid }}_{{ k }}" class="col-sm-2 control-label">{{ k }}</label>
                                 <div class="col-sm-10">

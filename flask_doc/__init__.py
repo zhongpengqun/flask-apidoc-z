@@ -1,7 +1,7 @@
 # coding=utf8
 
-import generator
-import describer
+from . import generator
+from . import describer
 
 __all__ = ['Generator', 'forms', 'args', 'gathering_form', 'gathering_args', 'BaseValidator', 'StrLenBetween',
            'NumberBetween', 'ValidDateTime', 'ValidEmail', 'ValidUrl', 'BaseValidator', 'gathering_body', 'JsonMapped',

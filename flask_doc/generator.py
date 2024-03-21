@@ -6,9 +6,9 @@ import sys
 from flask import Blueprint, Response, Markup
 import os
 from jinja2 import Environment, FileSystemLoader
-from utils import func_sign, js_string_to_html
+from .utils import func_sign, js_string_to_html
 import markdown
-import describer
+from .describer import api_forms, api_args, api_json
 
 
 apidoc_bp = Blueprint('api-doc', __name__, template_folder='', url_prefix='/api-doc')
@@ -195,7 +195,7 @@ class FunctionDocument(object):
             lines.append(u" ")
             lines.append(u"| Name | Type | Description |")
             lines.append(u"|:----- |:----| --------- |")
-            for k, param in self.url_params.iteritems():
+            for k, param in self.url_params.items():
                 lines.append(u"|%s|" % u"|".join([p if p else u' ' for p in param]))
         lines.append(u" ")
         if self.query_params:
@@ -269,7 +269,7 @@ class Generator(object):
         """
         ft_dict = dict(self.filters) if self.filters else {}
 
-        api_items = [(k, v) for k, v in self.app.view_functions.iteritems()]
+        api_items = [(k, v) for k, v in self.app.view_functions.items()]
         rules_arr = [(rule.endpoint, rule) for rule in self.app.url_map.iter_rules()]
         rules = dict(rules_arr)
 
@@ -278,6 +278,12 @@ class Generator(object):
             if api_name == 'static':
                 continue
 
+            print('----------')
+            print((api_name, api_func))
+            print(dir(api_func))
+            print('===========')
+
+            # 假设你用了flask的blueprint功能...
             prefix, _ = api_name.split('.')
             if self.filters and prefix not in ft_dict:
                 continue # 如果没有加进来就跳过不care
@@ -286,17 +292,18 @@ class Generator(object):
             rule = rules.get(api_name)
             url = rule.rule
             method = [m for m in list(rule.methods) if m != 'OPTIONS' and m != 'HEAD']
-            doc = api_func.func_doc
+            # doc = api_func.func_doc
+            doc = api_func.__doc__
             if not doc:
                 continue
 
             f_name = func_sign(api_func)
 
-            forms = describer.api_forms[f_name] if f_name in describer.api_forms else []
+            forms = api_forms[f_name] if f_name in api_forms else []
             
-            args = describer.api_args[f_name] if f_name in describer.api_args else []
+            args = api_args[f_name] if f_name in api_args else []
 
-            json_body = describer.api_json[f_name] if f_name in describer.api_json else None
+            json_body = api_json[f_name] if f_name in api_json else None
 
             if json_body:
                 assert forms == [], u"如果定义了json_form就能定义forms了"
@@ -310,11 +317,12 @@ class Generator(object):
                 bp.funcs = []
                 self.blueprints[prefix] = bp
 
-            bp.funcs.append(FunctionDocument(doc.decode('utf8'), url, method, rule.endpoint, prefix, forms, args, json_body))
+            # bp.funcs.append(FunctionDocument(doc.decode('utf8'), url, method, rule.endpoint, prefix, forms, args, json_body))
+            bp.funcs.append(FunctionDocument(doc, url, method, rule.endpoint, prefix, forms, args, json_body))
 
             bp.sort()
             
-        self.blueprint_ins = [bp for k, bp in self.blueprints.iteritems()]
+        self.blueprint_ins = [bp for k, bp in self.blueprints.items()]
 
         self.app.register_blueprint(apidoc_bp)
 
@@ -367,7 +375,7 @@ class Generator(object):
 def main():
     sys.path.append(os.getcwd())
     if len(sys.argv) < 2:
-        print "Missing argument: mod_name:<Flask App> for Example manager:app"
+        print("Missing argument: mod_name:<Flask App> for Example manager:app")
         sys.exit(1)
     if len(sys.argv) > 2:
         filter_arr = sys.argv[2].split(',')
@@ -380,9 +388,9 @@ def main():
         app = getattr(mod, var_name)
         g = Generator(app, filters=filter_arr)
         g.prepare()
-        print g.generate_markdown()
+        print(g.generate_markdown())
         sys.exit(0)
     except Exception as e:
         traceback.print_exc()
-        print "Can not import Flask app from argument", import_str
+        print(f"Can not import Flask app from argument {import_str}")
         sys.exit(1)
