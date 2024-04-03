@@ -29,4 +29,4 @@ def func_sign(func):
     :return: 
     :rtype: 
     """
-    return "%s.%s" % (func.__module__, func.func_name)
+    return "%s.%s" % (func.__module__, func.__name__)

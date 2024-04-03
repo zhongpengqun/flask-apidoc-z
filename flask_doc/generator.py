@@ -180,7 +180,8 @@ class FunctionDocument(object):
         :return:
         :rtype:
         """
-        lines = [u"### %s" % self.name, u" ", u"#### Overview"]
+        # lines = [u"### %s" % self.name, u" ", u"#### Overview"]
+        lines = [u"#### Overview"]
         for normal_line in self.normal_lines[1:]:
             lines.append(u"> %s" % normal_line)
         lines.append(u"")
@@ -188,7 +189,7 @@ class FunctionDocument(object):
         lines.append(u"> %s" % self.url)
         lines.append(u"")
         lines.append(u"#### HTTP Method")
-        lines.append(u"> %s" % self.method)
+        lines.append(u"> %s" % ','.join(self.method))
         if self.url_params:
             lines.append(u" ")
             lines.append(u"#### URL Parameter")
@@ -220,7 +221,8 @@ class FunctionDocument(object):
         for rt_line in self.return_lines:
             lines.append(u"%s" % rt_line)
         lines.append(u" ")
-        mark_down = u"\n".join(lines)
+        # mark_down = u"\n".join(lines)
+        mark_down = u"<br>".join(lines)
         return mark_down
 
 
@@ -332,27 +334,29 @@ class Generator(object):
         :return:
         :rtype:
         """
-        doc_lines = [u"API Document", u"----------------", u" "]
-        doc_lines.append(u"<center>")
-        doc_lines.append(u"### TOC Index")
-        doc_lines.append(u"</center>")
-        doc_lines.append(u" ")
-        doc_lines.append(u"| id | title |")
-        doc_lines.append(u"|:----- |:--------- |")
+        doc_lines = []
+        # doc_lines.append(u"<center>")
+        # doc_lines.append(u"### TOC Index")
+        # doc_lines.append(u"</center>")
+        # doc_lines.append(u" ")
+        # doc_lines.append(u"| id | title |")
+        # doc_lines.append(u"|:----- |:--------- |")
         for doc_idx, doc in enumerate(self.functions):
             doc_lines.append(u"|%s|" % u"|".join([str(doc_idx), doc.link()]))
-        doc_lines.append(u" ")
-        doc_lines.append(u"---")
-        doc_lines.append(u"  ")
-        doc_lines.append(u"  ")
+        # doc_lines.append(u" ")
+        # doc_lines.append(u"---")
+        # doc_lines.append(u"  ")
+        # doc_lines.append(u"  ")
         for bp in self.blueprint_ins:
-            doc_lines.append(u"#### %s" % bp.name)
+            # doc_lines.append(u"#### %s" % bp.name)
             for doc_idx, doc in enumerate(bp.funcs):
-                doc_lines.append(doc.anchor())
+                # doc_lines.append(doc.anchor())
                 doc_lines.append(doc.gen_markdown())
                 doc_lines.append(u" ")
                 doc_lines.append(u"---")
-        markdown = "\n".join([line.encode('utf8') for line in doc_lines])
+        # markdown = "\n".join([line.encode('utf8') for line in doc_lines])
+        # markdown = "\n".join(doc_lines)
+        markdown = "<br>".join(doc_lines)
         return markdown
 
     def generate_html(self):
